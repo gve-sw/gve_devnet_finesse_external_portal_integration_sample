@@ -1,0 +1,12 @@
+/**
+ * Default attributes for gadget body.
+ */
+body {
+    background: none transparent;
+    padding: 0px;
+}
+#displayFrame {
+    width:100%;
+    height:650;
+    border: 1px solid;
+}
