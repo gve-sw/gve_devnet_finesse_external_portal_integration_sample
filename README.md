@@ -8,13 +8,14 @@ performs API calls to detect agent and interaction state on that portal and to s
 * Raveesh Malyavantham (rmalyava@cisco.com)
 
 ## Solution Components
-* Unified Contact Center Enterprise
-* Third party customer interaction portal
+* Unified Contact Center Enterprise  
+* Third party customer interaction portal  
 
 
 ## Requirements
-   * Packaged Contact Center Enterprise 12.5 DevNet Sandbox from https://developer.cisco.com/site/sandbox/   
-   * Third party customer interaction portal
+   
+* Packaged Contact Center Enterprise 12.5 DevNet Sandbox from https://developer.cisco.com/site/sandbox/  
+* Third party customer interaction portal  
 
 ## Prerequisites
 
@@ -30,22 +31,51 @@ Go to https://devnetsandbox.cisco.com/RM/Topology and reserve a "Packaged Contac
 Once you receive the email with the subject "Your Cisco DevNet Sandbox Lab is Ready" from the sandbox, follow the instructions 
 in the email body to VPN into it with a Cisco AnyConnect client. 
 
+### Test sandbox Finesse Server and IP Phone simulator
+
+Ocassionally, the PCCE sandboxes have Finesse Server and/or IP Phone simulator (Camelot) issues. Before installing the 
+sample Gadget from this repository, make sure you can log into Finesse as an agent: 
+
+Launch the Finesse desktop for the agent using one of these 2 methods:
+
+a) Establish a Web RDP connection to the AW1-A virtual machine in the sandbox: 
+* hover the mouse over the rectangle representing that VM on the Sandbox and a popup menu appears; on the top there is a triangle and when you click it you should get an 
+"RDP" menu option. Click on it and a separate browser tab should appear with a Windows Server Desktop
+* Launch Firefox on the desktop. Select the "Finesse Agent" bookmark or just type this URL in the address bar:   
+https://fin-pub-a-50.berlin.icm:8445/desktop/container/landing.jsp?locale=en_US    
+
+b) 
+Launch a browser on your local machine and navigate to: https://fin-pub-a-50.berlin.icm:8445/desktop/container/landing.jsp?locale=en_US   
+
+For both methods, use the following credentials to log in:  
+
+    *Agent Name:* agent one  
+    *Username:* agent1  
+    *Password:* cisco123  
+    *Extension:* 1001  
+  
+* You might see an error indicating that "Failed to connect to the phone. Attempting to sign in again in 51 seconds
+Attempt: [1/3]"; let it count down and retry.  If if fails to re-connect you might have a bad IP Phone simulator and
+will have to reserve another sandbox.
+
+* You might also get a "Finesse server down" type error on the browser. You can try re-booting the Finesse Server on the
+sandbox but if that fails to correct the problem, you also need to spin up a new sandbox. 
+
 
 ### Enable the 3rdpartygadget account on the Finesse Server:
 
 From a terminal window on your PC, execute the following commands: 
 ```
 % ssh -l Administrator 10.10.20.50
-administrator@198.18.133.16's password: C!sc0DevNet
-
+Administrator@10.10.20.50's password: C!sc0DevNet
 Command Line Interface is starting up, please wait ...
 
    Welcome to the Platform Command Line Interface
 
 VMware Installation:
-	2 vCPU: Intel(R) Xeon(R) CPU E7- 2830  @ 2.13GHz
+	4 vCPU: Intel(R) Xeon(R) CPU E5-4669 v4 @ 2.20GHz
 	Disk 1: 146GB, Partitions aligned
-	8192 Mbytes RAM
+	4096 Mbytes RAM
 
 admin:utils reset_3rdpartygadget_password
 New Password: ciscocisco
@@ -133,6 +163,9 @@ Enter the administrator's password: C!sc0DevNet in the Password field.
 
 Click the Desktop Layout tab
 
+NOTE: Sometimes it takes a while for the Desktop Layout user interface elements to show on the browser, but if it takes longer than a minute you might 
+want to try with a different browser.
+
 Add the new AcquireApp Gadget right before the TaskManagement Gadget within the Home tab for the Agent layout. 
 You might also want to remove all other gadgets in the home tab so only the AcquireApp Gadget remains. If so, the 
 section corresponding to that tab should end up looking like this:  
@@ -176,17 +209,24 @@ admin:
 ## Usage
 
 
-- On your local machine, launch the Finesse desktop for the agent:  
-https://fin-pub-a-50.berlin.icm:8445/desktop/container/landing.jsp?locale=en_US
+* On your local machine, launch the Finesse desktop for the agent:    
+https://fin-pub-a-50.berlin.icm:8445/desktop/container/landing.jsp?locale=en_US  
 
-Agent Name: agent one  
-Username: agent1  
-Password: cisco123  
-Extension: 1001  
+    *Agent Name:* agent one  
+    *Username:* agent1  
+    *Password:* cisco123  
+    *Extension:* 1001  
 
-- On the home tab, you will see the Acquire gadget as the first one with a button to open Acquire.io. Click on the button 
-to launch the Acquire agent desktop on a separate tab. 
 
+* On the home tab, you will see the Acquire gadget as the first one with a button to open Acquire.io. Click on the button 
+to launch the Acquire agent desktop on a separate tab.  
+
+* Inspect (open developer tools) the browser you are using for Finesse and open the Console window. Now toggle 
+agent availability between Ready and some other state. Notice on the console there are messages like "=====Gadget.Log -> Agent Not Ready ======" 
+and "=====Gadget.Log -> Not Ready reason code: ". If you look for these in the `AcquireApp.js` source code, you can
+ find the location where you can add your own code to make API calls out to the third party portal to report agent 
+ status on the Cisco Unified Contact Center Enterprise side be it manually originated in the Finesse interface, or 
+generated by the system (i.e. agent does not answer call routed to him/her in a predetermined amount of time)
 
 
 # Screenshots
